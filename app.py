@@ -54,7 +54,7 @@ async def tapo_on():
     tapo_password = os.getenv("TAPO_PASSWORD")
     device_ip = os.getenv("DEVICE_IP")
     await P100_on(tapo_username,tapo_password,device_ip)
-    return {"device_on":True}
+    return {"status":"on"}
 
 @app.get('/tapo/off')
 async def tapo_off():
@@ -62,7 +62,7 @@ async def tapo_off():
     tapo_password = os.getenv("TAPO_PASSWORD")
     device_ip = os.getenv("DEVICE_IP")
     await P100_off(tapo_username,tapo_password,device_ip)
-    return {"device_on":False}
+    return {"status":"off"}
 
 @app.get('/tapo/status')
 async def tapo_status():
@@ -70,4 +70,7 @@ async def tapo_status():
     tapo_password = os.getenv("TAPO_PASSWORD")
     device_ip = os.getenv("DEVICE_IP")
     result = await P100_info(tapo_username,tapo_password,device_ip)
-    return {"device_on": result["device_on"]}
+    if result["device_on"]:
+        return {"status": "on"}
+    else:
+        return {"status": "off"}
