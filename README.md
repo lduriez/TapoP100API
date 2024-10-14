@@ -33,3 +33,41 @@ response_template:
   {% set resp = http_request.last_response().json() %}
   {resp["status"].lower()}
 ```
+
+## Tapo P100 API as a service
+
+If you want to make this python web server as a service do the following :
+
+- follow the download and venv creation describe un [How to run](https://github.com/lduriez/TapoP100API?tab=readme-ov-file#how-to-run)
+- go to the `TapoP100API` directory and create a `.env` file with
+
+```ini
+TAPO_USERNAME='<your_tapo_username>'
+TAPO_PASSWORD='<your_tapo_password>'
+DEVICE_IP='<your_tapo_device_ip>'
+```
+
+- create a file `/etc/systemd/system/tapo_api.service``
+
+```ini
+[Unit]
+Description=Tapo FastAPI
+After=network.target
+
+[Service]
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/TapoP100API
+Environment="PATH=/home/pi/TapoP100API/venv/bin"
+EnvironmentFile=/home/pi/TapoP100API/.env
+ExecStart=/home/pi/TapoP100API/venv/bin/uvicorn app:app --reload --host 127.0.0.1 --port 5000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+- reload systemctl: `sudo systemctl daemon-relaod`
+- start the service: `sudo systemctl start tapo_api`
+- enable the service: `sudo systemctl enable tapo_api`
